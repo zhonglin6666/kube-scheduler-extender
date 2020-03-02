@@ -2,7 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/emicklei/go-restful"
@@ -12,6 +11,7 @@ import (
 )
 
 func predicates(r *restful.Request, w *restful.Response) {
+	logrus.Infof("predicates begin")
 	var extenderArgs schedulerapi.ExtenderArgs
 
 	if err := r.ReadEntity(&extenderArgs); err != nil {
@@ -37,27 +37,20 @@ func handleFilter(args schedulerapi.ExtenderArgs) *schedulerapi.ExtenderFilterRe
 	canNotSchedule := make(map[string]string)
 
 	for _, node := range args.Nodes.Items {
-		// 调用自己的处理逻辑方法 判断该pod可不可以在该节点上运行
 		result, err := predicateHandler(*pod, node)
-		fmt.Printf("===>extender node:%v, result:%v\n", node.Name, result)
 		if err != nil {
 			canNotSchedule[node.Name] = err.Error()
-		} else {
-			if result {
-				canSchedule = append(canSchedule, node)
-			}
+		} else if result {
+			canSchedule = append(canSchedule, node)
 		}
 	}
-
-	result := schedulerapi.ExtenderFilterResult{
+	return &schedulerapi.ExtenderFilterResult{
 		Nodes: &v1.NodeList{
 			Items: canSchedule,
 		},
 		FailedNodes: canNotSchedule,
 		Error:       "",
 	}
-
-	return &result
 }
 
 func predicateHandler(pod v1.Pod, node v1.Node) (bool, error) {

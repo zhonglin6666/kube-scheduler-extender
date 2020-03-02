@@ -43,8 +43,8 @@ func makeWebService(s *Server) *restful.WebService {
 		Doc("scheduler predicate").
 		Returns(http.StatusOK, "OK", ""))
 
-	ws.Route(ws.GET("/prioritize").To(prioritizes).
-		Doc("scheduler prioritize").
+	ws.Route(ws.POST("/priorities").To(priorities).
+		Doc("scheduler priorities").
 		Returns(http.StatusOK, "OK", ""))
 
 	return ws

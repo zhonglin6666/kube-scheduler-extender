@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: perf
+  labels:
+    app: perf
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: perf
+  template:
+    metadata:
+      annotations:
+        io.kubernetes.cri.untrusted-workload: "true"
+      labels:
+        app: perf
+    spec:
+      schedulerName: my-scheduler
+      containers:
+      - name: perf
+        image: qperf:latest
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          privileged: true
+          capabilities:
+            add: ["SYS_ADMIN"]
+          allowPrivilegeEscalation: true

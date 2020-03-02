@@ -4,7 +4,7 @@ schedulerName: my-scheduler
 algorithmSource:
   policy:
     file:
-      path: policy.yaml
+      path: extender-policy.yaml
 leaderElection:
   leaderElect: true
   lockObjectName: my-scheduler
