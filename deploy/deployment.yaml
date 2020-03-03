@@ -1,0 +1,56 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: kube-scheduler-extender
+  namespace: kube-system
+spec:
+  selector:
+    app: kube-scheduler-extender
+  ports:
+    - protocol: TCP
+      port: 8880
+      targetPort: 8880
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kube-scheduler-extender
+  namespace: kube-system
+  labels:
+    app: kube-scheduler-extender
+spec:
+  selector:
+    matchLabels:
+      app: kube-scheduler-extender
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: kube-scheduler-extender
+    spec:
+      serviceAccount: kube-scheduler-extender-account
+      containers:
+        - name: kube-scheduler-extender
+          image: kube-scheduler-extender:latest
+          imagePullPolicy: IfNotPresent
+          args:
+            - --debug
+            - daemon
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8880
+            initialDelaySeconds: 3
+            periodSeconds: 3
+            successThreshold: 1
+            failureThreshold: 3
+            timeoutSeconds: 2
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8880
+            initialDelaySeconds: 3
+            periodSeconds: 3
+            successThreshold: 1
+            failureThreshold: 3
+            timeoutSeconds: 2

@@ -16,7 +16,7 @@ spec:
       labels:
         app: perf
     spec:
-      schedulerName: my-scheduler
+      schedulerName: kube-scheduler-extender
       containers:
       - name: perf
         image: qperf:latest

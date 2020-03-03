@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: policy-config
+  namespace: kube-system
+data:
+  policy.cfg: |-
+    {
+      "kind" : "Policy",
+      "apiVersion" : "v1",
+      "predicates" : [
+        {"name" : "PodFitsHostPorts"},
+        {"name" : "PodFitsResources"},
+        {"name" : "NoDiskConflict"},
+        {"name" : "MatchNodeSelector"},
+        {"name" : "HostName"}
+      ],
+      "priorities" : [
+        {"name" : "LeastRequestedPriority", "weight" : 1},
+        {"name" : "BalancedResourceAllocation", "weight" : 1},
+        {"name" : "ServiceSpreadingPriority", "weight" : 1},
+        {"name" : "EqualPriority", "weight" : 1}
+      ],
+      "extenders" : [{
+        "urlPrefix": "http://kube-scheduler-extender.kube-system:8880",
+        "filterVerb": "predicates",
+        "prioritizeVerb": "priorities",
+        "preemptVerb": "preemption",
+        "bindVerb": "",
+        "weight": 1,
+        "enableHttps": false,
+        "nodeCacheCapable": false
+       }],
+      "hardPodAffinitySymmetricWeight" : 10
+    }
